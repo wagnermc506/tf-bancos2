@@ -138,3 +138,23 @@ CREATE TABLE assiste (
         ON DELETE RESTRICT
         ON UPDATE RESTRICT
 )ENGINE = InnoDB;
+
+
+CREATE TABLE conecta_anime_recomendados(
+    anime1 INT NOT NULL,
+    anime2 INT NOT NULL,
+    usuario INT NOT NULL,
+
+    CONSTRAINT conecta_anime_recomendados_anime1_fk FOREIGN KEY (anime1) REFERENCES ANIME(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+    CONSTRAINT conecta_anime_recomendados_anime2_fk FOREIGN KEY (anime2) REFERENCES ANIME(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+
+    CONSTRAINT conecta_anime_recomendados_usuario_fk FOREIGN KEY (usuario) REFERENCES USUARIO(id)
+        ON DELETE RESTRICT
+        ON UPDATE RESTRICT,
+
+    CONSTRAINT conecta_anime_recomendados_unique UNIQUE (anime1, anime2, usuario)
+)ENGINE = InnoDB;

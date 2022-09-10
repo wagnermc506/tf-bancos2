@@ -1,4 +1,4 @@
-MAX_COUNT = 1
+MAX_USERS = 50
 class GetData:
     def __init__(self, connection, db):
         self.connection = connection
@@ -12,7 +12,7 @@ class GetData:
                 for j in range(len(user["liked_animes"])):
                     for gender in user["liked_animes"][i]['genders']:
                         if gender in user["liked_animes"][j]['genders']:
-                            print(f'Anime {user["liked_animes"][i]["id"]} conectado com {user["liked_animes"][j]["id"]}')
+                            self.connection.execute(self.db.text(f'insert into conecta_anime_recomendados (anime1, anime2, usuario) VALUES ({user["liked_animes"][i]["id"]}, {user["liked_animes"][j]["id"]}, {user["id"]})'))
                             break
 
 
@@ -21,12 +21,10 @@ class GetData:
         user_list = self.get_user_data()
         i = 0
         for user in user_list:
-            user_full_info = {"id": user['id']}
-
             i+=1
-            if i > MAX_COUNT:
+            if i > MAX_USERS:
                 break
-        
+            user_full_info = {"id": user['id']}
             watched_animes  = self.get_watched_animes(user['id'])
             user_full_info["liked_animes"] = []
             for anime in watched_animes:
@@ -44,9 +42,6 @@ class GetData:
             users_full_info_list.append(user_full_info)
         return users_full_info_list
 
-                
-    def connect_liked_animes(self):
-        pass
 
     def get_user_data(self):
         return self.connection.execute(self.db.text('select * from USUARIO'))
@@ -62,5 +57,20 @@ class GetData:
     
     def get_gender_info(self, gender_id):
         return self.connection.execute(self.db.text(f'select * from GENERO where id={gender_id}')).first()
-        
+    
+    def get_recommended_anime(self, anime_id):
+        return self.connection.execute(self.db.text(f'select COUNT(anime2) as recommendTimes, anime2 from conecta_anime_recomendados where anime1={anime_id} group by anime2'))
+
+    def get_recomendation(self, user_id):
+        watched_animes = self.get_watched_animes(user_id)
+        recommend_anime_set = set()
+        for anime in watched_animes:
+            recommend_anime_list = self.get_recommended_anime(anime['anime'])
+            for recommended_anime in recommend_anime_list:
+                anime_info = self.get_anime_info(recommended_anime['anime2'])
+                if recommended_anime["recommendTimes"] > 10:
+                    print(recommended_anime["recommendTimes"])
+                    recommend_anime_set.add(anime_info['nome'])
+        # print(recommend_anime_set)
+
             

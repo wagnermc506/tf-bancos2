@@ -69,8 +69,7 @@ class GetData:
             for recommended_anime in recommend_anime_list:
                 anime_info = self.get_anime_info(recommended_anime['anime2'])
                 if recommended_anime["recommendTimes"] > 10:
-                    print(recommended_anime["recommendTimes"])
                     recommend_anime_set.add(anime_info['nome'])
-        # print(recommend_anime_set)
+        print(recommend_anime_set)
 
             
